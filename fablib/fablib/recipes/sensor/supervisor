@@ -1,0 +1,52 @@
+#! /bin/bash -e
+
+# /etc/init.d/supervisor: start and stop the Supervisor daemon manager
+# For Ubuntu Linux 7.10
+#
+# Remember to change the variables below to match your supervisord paths
+#
+# "start" is working fine for me but "stop" isn't, so I have to kill
+# supervisord manually and "supervisorctl reload" doesn't work.  Normally you
+# keep supervisor running until the system shuts down, so this isn't a big deal
+# except when you change /etc/supervisord.conf.
+
+SUPERVISORD=/usr/local/bin/supervisord
+SUPERVISORCTL=/usr/local/bin/supervisorctl
+PIDFILE=/var/run/supervisord.pid
+OPTS="-c /etc/supervisord.conf"
+
+test -x $SUPERVISORD || exit 0
+
+. /lib/lsb/init-functions
+
+export PATH="${PATH:+$PATH:}/usr/local/bin:/usr/sbin:/sbin"
+
+start () {
+	log_begin_msg "Starting Supervisor daemon manager..."
+	$SUPERVISORD $OPTS || log_end_msg 1
+	log_end_msg 0
+}
+
+stop () {
+	log_begin_msg "Stopping Supervisor daemon manager..."
+	$SUPERVISORCTL shutdown || log_end_msg 1
+	log_end_msg 0
+}
+
+case "$1" in
+  start)
+    start
+	;;
+
+  stop)
+    stop
+	;;
+
+  restart|reload|force-reload)
+    stop
+    start
+    ;;
+
+esac
+
+exit 0
