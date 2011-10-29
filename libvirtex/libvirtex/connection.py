@@ -105,10 +105,10 @@ class virDomainEx(libvirt.virDomain):
     
     @classmethod
     def commonFields(cls, root, config):
-        root << ('name', config.name)
-        root << ('memory', str(config.memory))
+        root.name(config.name)
+        root.memory(str(config.memory))
         root.uuid
-        root << ('vcpu', str(config.vcpu))
+        root.vcpu(str(config.vcpu))
     
     @classmethod
     def generateOS(cls, root, config):
@@ -116,9 +116,9 @@ class virDomainEx(libvirt.virDomain):
     
     @classmethod
     def powerFeatures(cls, root, config):
-        root << ('on_poweroff', 'destroy')
-        root << ('on_reboot', 'restart')
-        root << ('on_crash', 'destroy')
+        root.on_poweroff('destroy')
+        root.on_reboot('restart')
+        root.on_crash('destroy')
         
         with root.features:
             root.acpi
@@ -129,21 +129,21 @@ class virDomainEx(libvirt.virDomain):
     def emulator(cls, root, config):
         if cls.emulator_path is None:
             raise libvirt.libvirtError("Class %r has no emulator_path field" % cls)
-        root << ('emulator', cls.emulator_path)
+        root.emulator(cls.emulator_path)
 
     @classmethod
     def commonDevices(cls, root, cfg):
-                with root('serial', type='pty'):
-                    root << ('target', {'port':'0'})
+                with root.serial(type='pty'):
+                    root.target(port='0')
                 
-                with root('console', type='pty'):
-                    root << ('target', {'port':'0'})
+                with root.console(type='pty'):
+                    root.target(port='0')
                 
-                root << ('input', {'bus':'ps2', 'type':'mouse'})
-                root << ('graphics', {'autoport':'yes', 
-                                      'keymap':'en-us', 
-                                      'type':'vnc', 
-                                      'port':'-1'})
+                root.input(bus=ps2, type=mouse)
+                root.graphics(autoport='yes', 
+                              keymap='en-us', 
+                              type='vnc', 
+                              port='-1')
 
     @classmethod
     def makeXML(cls, name, memory, vcpu, *devices):
@@ -152,27 +152,27 @@ class virDomainEx(libvirt.virDomain):
             raise libvirt.libvirtError("%r can't be instanciated - no domain type" \
                                 % cls)
             
-        root = XMLBuilder(format=True)
         
         cfg = DomainConfig(name, memory, vcpu, devices)
         
-        with root('domain', type=cls.domain_type):
-            cls.commonFields(root, cfg)
-                        
-            with root('os'):
-                cls.generateOS(root, cfg)
+        root = XMLBuilder('domain', type=cls.domain_type)
+
+        cls.commonFields(root, cfg)
+                    
+        with root.os:
+            cls.generateOS(root, cfg)
+        
+        root.clock(sync='localtime')
+        
+        cls.powerFeatures(root, cfg)
+        
+        with root.devices:
+            cls.emulator(root, cfg)
             
-            root << ('clock', {'sync':'localtime'})
+            for dev in devices: 
+                dev.toxml(root)
             
-            cls.powerFeatures(root, cfg)
-            
-            with root('devices'):
-                cls.emulator(root, cfg)
-                
-                for dev in devices: 
-                    dev.toxml(root)
-                
-                cls.commonDevices(root, cfg)
+            cls.commonDevices(root, cfg)
 
         return root
     
@@ -236,12 +236,12 @@ class KVMDomain(virDomainEx):
     
     @classmethod
     def generateOS(cls, root, config):
-        root << ('type', 'hvm')
-        root << ('loader', cls.hvloader)
-        root << ('boot', {'dev':'hd'})
-        root << ('boot', {'dev':'cdrom'})
-        root << ('bootmenu', {'enable':'yes'})
-        root << ('bios', {'useserial':'yes'})
+        root.type('hvm')
+        root.loader(cls.hvloader)
+        root.boot(dev='hd')
+        root.boot(dev='cdrom')
+        root.bootmenu(enable='yes')
+        root.bios(useserial='yes')
 
 
 class LXCDomain(virDomainEx):
@@ -251,14 +251,14 @@ class LXCDomain(virDomainEx):
     
     @classmethod
     def generateOS(cls, root, config):
-        root << ('type', 'exe')
-        root << ('init', '/sbin/init')
+        root.type('exe')
+        root.init('/sbin/init')
     
     @classmethod
     def powerFeatures(cls, root, config):
-        root << ('on_poweroff', 'destroy')
-        root << ('on_reboot', 'restart')
-        root << ('on_crash', 'destroy')
+        root.on_poweroff('destroy')
+        root.on_reboot('restart')
+        root.on_crash('destroy')
 
     @classmethod
     def commonDevices(cls, root, config):

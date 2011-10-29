@@ -15,11 +15,11 @@ class ETHNetworkDevice(ETHDevice):
         self.ip = ip
     
     def toxml(self, root):
-        with root('interface', type='network'):
-            root << ('source', {'network': self.network})
-            root << ('forward', {'mode':self.mode})
-            root << ('target', {'dev':self.tdev})
-            root << ('mac', {'address':self.hw})
+        with root.interface(type='network'):
+            root.source(network=self.network)
+            root.forward(mode=self.mode)
+            root.target(dev=self.tdev)
+            root.mac(address=self.hw)
 
     @classmethod
     def fromxml(cls, findall):
@@ -37,10 +37,10 @@ class ETHBridgedDevice(ETHDevice):
         self.ip = ip
     
     def toxml(self, root):
-        with root('interface', type='bridge'):
-            root << ('source', {'bridge': self.bridge})
-            root << ('target', {'dev':self.tdev})
-            root << ('mac', {'address':self.hw})
+        with root.interface(type='bridge'):
+            root.source(bridge=self.bridge)
+            root.target(dev=self.tdev)
+            root.mac(address=self.hw)
 
     @classmethod
     def fromxml(cls, findall):
@@ -57,9 +57,9 @@ class FileSystemDevice(Device):
         self.target = target
     
     def toxml(self, root):
-        with root('filesystem', type='mount'):
-            root << ('source', {'dir' : self.source})
-            root << ('target', {'dir' : self.target})
+        with root.filesystem(type='mount'):
+            root.source(dir=self.source)
+            root.target(dir=self.target)
         
 class HDDBlockDevice(Device):
     def __init__(self, dev_path,
@@ -80,15 +80,11 @@ class HDDBlockDevice(Device):
         return cls(path, 'block', device = 'cdrom', dev = 'vdc')
 
     def toxml(self, root):
-        with root('disk', device=self.device, type='block'):
-            root << ('driver', {'type' : self.type_, 
-                                'name' : self.driver})
-            root << ('source', 
-                {'dev': self.dev_path})
-            
+        with root.disk(device=self.device, type='block'):
+            root.driver(type=self.type_, name=self.driver)
+            root.source(dev=self.dev_path)
             root.boot
-            
-            root << ('target', {'bus':self.bus, 'dev' : self.dev})
+            root.target(bus=self.bus, dev=self.dev)
 
 class HDDFileDevice(Device):
     def __init__(self, image_path,
@@ -109,13 +105,9 @@ class HDDFileDevice(Device):
         return cls(path, 'file', device = 'cdrom', dev = 'vdc')
 
     def toxml(self, root):
-        with root('disk', device=self.device, type='file'):
-            root << ('driver', {'type' : self.type_, 
-                                'name' : self.driver})
-            root << ('source', 
-                {'file': self.image_path})
-            
+        with root.disk(device=self.device, type='file'):
+            root.driver(type=self.type_, name=self.driver)
+            root.source(file=self.image_path)
             root.boot
-            
-            root << ('target', {'bus':self.bus, 'dev' : self.dev})
+            root.target(bus=self.bus, dev=self.dev)
 

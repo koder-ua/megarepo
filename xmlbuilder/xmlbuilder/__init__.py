@@ -20,14 +20,15 @@ x.some_tag_with_data('text', a='12')
 with x.some_tree(a='1'):
     with x.data:
         x.mmm
-        [x.node(val=str(i)) for i in range(10)]
+        for i in range(10):
+            x.node(val=str(i))
 
 etree_node = ~x # <= return xml.etree.ElementTree object
 print str(x) # <= string object
 
 will result:
 
-<?xml version="1.0" encoding="%s" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <root>
     <some_tag />
     <some_tag_with_data a="12">text</some_tag_with_data>
@@ -54,7 +55,7 @@ formatted = produce formatted xml. default = True
 tabstep   = tab string, used for formatting. default = ' ' * 4
 encoding  = xml document encoding. default = 'utf-8'
 xml_header = add xml header
-                (<?xml version="1.0" encoding="%DOCUMENT_ENCODING">)
+                (<?xml version="1.0" encoding="$DOCUMENT_ENCODING$">)
             to begining of the document. default = True
 builder = builder class, used for create dcument. Default =
                         xml.etree.ElementTree.TreeBuilder
@@ -206,4 +207,53 @@ class XMLBuilder(object):
     def __invert__(self):
         return ~self.__stack[0]
 
+#-------------------------------------------------------------------------------
+def make_text_attr(text, attrs_dict):
+    if attrs_dict.items():
+        attrs = ", ".join('{0}={1!r}'.format(name, val) 
+                                for name, val in attrs_dict.items())
+    else:
+        attrs = ""
+
+    if text and text.strip() != '':
+        text = text.strip()
+    else:
+        text = ""
+    
+    if text and attrs:
+        text_attr = "{0!r}, {1}".format(text, attrs)
+    elif text:
+        text_attr = repr(text)
+    else:
+        text_attr = attrs
+    
+    return text_attr
+
+def xml2py(xml, name, tabstep=" " * 4):
+    etree = fromstring(xml)
+    text_attr = make_text_attr(etree.text, etree.attrib)
+
+    if text_attr:
+        res = "{0} = XMLBuilder({1}, {0})".format(name, text_attr)
+    else:
+        res = "{0} = XMLBuilder({1})".format(name)
+    
+    return res + "\n" + "\n".join(
+        tabstep * tab + data for tab, data in _xml2py(etree, name))
+
+def _xml2py(etree, name):
+
+    childs = etree.getchildren()
+    
+    text_attr = make_text_attr(etree.text, etree.attrib)
+    
+    if len(childs) != 0:
+        yield 0, "with {0}.{1}({2}):".format(name, etree.tag, text_attr)
+
+        for elem in childs:
+            for tab, data in _xml2py(elem, name):
+                yield tab + 1, data
         
+    else:
+        yield 0, "{0}.{1}({2})".format(name, etree.tag, text_attr)
+#-------------------------------------------------------------------------------
