@@ -1,4 +1,5 @@
 .git
 dist
 *.pyc
+non_packaged
 *.egg-info*
