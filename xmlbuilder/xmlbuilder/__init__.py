@@ -65,7 +65,7 @@ Options can be readed by
 x = XMLBuilder('root')
 print x[option_name]
 
-end changed by
+and changed by
 
 x[option_name] = new_val
 
@@ -137,7 +137,7 @@ class XMLNode(object):
             tab = "\n" + self.__document()['tabstep'] * level
             builder.data(tab)
         else:
-            tab = None
+            tab = ""
             
         builder.start(self.__tag, self.__attrs)
         
@@ -159,7 +159,6 @@ class XMLNode(object):
     def __enter__(self):
         return self.__document()(self)
         
-    
     def __exit__(self, x, y, z):
         self.__document()(None)
 
@@ -234,7 +233,7 @@ def xml2py(xml, name, tabstep=" " * 4):
     text_attr = make_text_attr(etree.text, etree.attrib)
 
     if text_attr:
-        res = "{0} = XMLBuilder({1}, {0})".format(name, text_attr)
+        res = "{0} = XMLBuilder({0!r}, {1})".format(name, text_attr)
     else:
         res = "{0} = XMLBuilder({1})".format(name)
     
@@ -257,3 +256,14 @@ def _xml2py(etree, name):
     else:
         yield 0, "{0}.{1}({2})".format(name, etree.tag, text_attr)
 #-------------------------------------------------------------------------------
+if __name__ == "__main__":
+    import sys
+    if len(sys.argv) != 2:
+        sys.stderr.write("Usage : {0} XML_FILE_NAME\n".format(sys.argv[0]))
+    else:
+        print(xml2py(open(sys.argv[1]).read(), 'root'))
+#-------------------------------------------------------------------------------
+    
+    
+    
+    

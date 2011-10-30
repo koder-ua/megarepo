@@ -1,3 +1,4 @@
+# -*- encoding:utf8 -*-
 from __future__ import with_statement
 from nose.tools import eq_, raises
 from xmlbuilder import XMLBuilder
@@ -129,6 +130,29 @@ class TestXMLBuilder(object):
             self.xml.tt
 
         eq_(str(self.xml), '<root><tree_root a="dt">11<tt /></tree_root></root>')        
+
+    def test_unicode(self):
+        with self.xml.tree_root(a=u'dt'):
+            self.xml << u'11'
+            self.xml.tt('12')
+
+        eq_(str(self.xml), u'<root><tree_root a="dt">11<tt>12</tt></tree_root></root>')        
+
+    def test_unicode1(self):
+        with self.xml.tree_root(a=u'dt'):
+            self.xml << u'11'
+            self.xml.tt('12')
+
+        eq_(unicode(self.xml),
+            u'<root><tree_root a="dt">11<tt>12</tt></tree_root></root>')        
+
+    def test_unicode2(self):
+        with self.xml.tree_root(a=u'dt'):
+            self.xml << u'бла-бла-бла'
+            self.xml.tt('12')
+
+        eq_(str(self.xml).decode('utf8'),
+            u'<root><tree_root a="dt">бла-бла-бла<tt>12</tt></tree_root></root>')        
 
     def test_with_all(self):
         self.xml.top
