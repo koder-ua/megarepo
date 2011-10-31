@@ -56,11 +56,17 @@ class PackageManager(object):
         pass
     
     @classmethod
-    def install_package(cls, requirement):
+    def install_packages(cls, requirements):
         "install package, accept Requirement of string"
-        if isinstance(requirement, basestring):
-            requirement = Requirement.from_str(requirement)
-        return cls.do_install_package(requirement)
+        ready_req = []
+        
+        for requirement in requirements:
+            if isinstance(requirement, basestring):
+                ready_req.append(Requirement.from_str(requirement))
+            else:
+                ready_req.append(requirement)
+        
+        return cls.do_install_packages(*ready_req)
     
     @classmethod
     def do_install_package(cls, requirement):
@@ -82,6 +88,11 @@ class PackageManager(object):
         "find which package provides this cmd"
         pass
     
+    @classmethod
+    def get_not_installed(cls, packages):
+        all = set(name for name,_1,_2 in cls.get_all_installed())
+        packages = set(packages)
+        return packages - all
 
 class ApgGetUbuntu(PackageManager):
     "ubuntu apt-get insterface for PackageManager"
@@ -94,17 +105,20 @@ class ApgGetUbuntu(PackageManager):
         return str(res).split(' ')[0] == 'ii'
     
     @classmethod
-    def do_install_package(cls, requirement):
-            
-        if requirement.oper == '==':
-            sudo('apt-get -y --force-yes install {0}={1}'.format(
-                                                   requirement.package, 
-                                                   requirement.version))
-        elif requirement.oper is None:
-            sudo('apt-get -y --force-yes install {0}'.format(requirement.package))
-        else:
-            raise RuntimeError(
-                "apt-get can't handle {0} version operator".format(requirement.oper))
+    def do_install_packages(cls, *requirements):
+        reqs = []
+        
+        for requirement in requirements:
+            if requirement.oper == '==':
+                reqs.append('{0}={1}'.format(requirement.package, 
+                                            requirement.version))
+            elif requirement.oper is None:
+                reqs.append('{0}'.format(requirement.package))
+            else:
+                raise RuntimeError(
+                    "apt-get can't handle {0} version operator".format(requirement.oper))
+        
+        sudo('apt-get -y --force-yes install ' + " ".join(reqs))
     
     @classmethod
     def uninstall_package(cls, name):
@@ -115,8 +129,10 @@ class ApgGetUbuntu(PackageManager):
         return cmd
     
     @classmethod
-    def get_all_installed(cls, packagename):
-        res = run('dpkg -l')
+    def get_all_installed(cls):
+        with hide('stdout'):
+            res = run('dpkg -l')
+            
         for line in res.split('\n'):
             words = [word.strip() for word in line.split(' ') if word.strip()]
             if words[0] == 'ii':
@@ -182,10 +198,15 @@ def check_pkg(name):
     "check that package installed"
     return pkg().check_package(name)
 
-def install(package):
+def get_not_installed(packages):
+    "get all packages from list, which not installed"
+    return pkg().get_not_installed(packages)
+    
+def install(packages):
     "install package, if not installed already"
-    if not check_pkg(package):
-        pkg().install_package(package)
+    install_me = get_not_installed(packages.split(','))
+    if install_me:
+        pkg().install_packages(install_me)
 
 def uninstall(package):
     "uninstall package, if installed"
@@ -322,12 +343,23 @@ def get_rf(path):
 def put_rf(path, val, use_sudo=False):
     put(StringIO(val), path, use_sudo=use_sudo)
 
-def replace_in_file(fname, text1, text2, use_sudo=False):
-    fc = get_rf(fname)
-    if text1 in fc:
-        put_rf(fname, fc.replace(text1, text2), use_sudo=use_sudo)
-        return True
-    return False
+def replace_in_file(fname, re1, re2, use_sudo=False):
+    res = []
+    rr = re.compile(re1)
+    found = False
+    
+    for text1 in get_rf(fname).split('\n'): 
+                    
+        ntext = rr.sub(re2, text1)
+        if ntext != text1:
+            found = True
+            
+        res.append(ntext)
+
+    if found:
+        put_rf(fname, "\n".join(res), use_sudo=use_sudo)
+
+    return found
 
 def make_remote_dir(path, use_sudo=False):
     cmd = sudo if use_sudo else run
