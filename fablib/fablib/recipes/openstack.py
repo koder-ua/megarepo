@@ -3,32 +3,14 @@ import uuid
 
 from fabric.api import *
 from fabric.context_managers import *
-from fabric.contrib.files import exists
+from fabric.contrib.files import exists, append
 
 from fablib.core import provides, provides_pkg, ensure, install, check_cmd,\
-                        put_rf, get_rf, set_hosts, replace_in_file
+                        put_rf, get_rf, set_hosts, replace_in_file,\
+                        get_tfile, upstart_restart
 
 from fablib.fab_os import add_apt_sources
-
-def get_tfile():
-    return '/tmp/' + str(uuid.uuid1())
-    
-def psql(cmd, user='postgres'):
-    fname = get_tfile()
-    put_rf(fname, cmd)
-    
-    try:
-        sudo("""su - {0} -c "psql -f {1}" """.format(user, fname))
-    finally:
-        run('rm ' + fname)
-
-def upstart_restart(name):
-    res = sudo('status ' + name)
-    if 'stop/waiting' in str(res):
-        sudo('start ' + name)
-    else:
-        sudo('restart ' + name)
-    
+from fablib.recipes.postgres import psql    
     
 nova_config = """
 --dhcpbridge_flagfile=/etc/nova/nova.conf
@@ -66,18 +48,14 @@ def install_nova(ip, net, net_prefix, lvm_dev,
     replace_in_file("/etc/postgresql/9.1/main/postgresql.conf",
             "#listen_addresses\s+=\s+'localhost'(.*)",
             r"listen_addresses = '*'\1", use_sudo=True)
-    
-    
+        
     
     pg_hba = '/etc/postgresql/9.1/main/pg_hba.conf'
-    sudo("chmod a+r " + pg_hba)
+    add = "host    all         all             0.0.0.0/0       md5"
+    
+    sudo("chmod a+rw " + pg_hba)
     try:
-        fc = get_rf(pg_hba)
-        add = "\nhost    all         all             0.0.0.0/0       md5\n"
-        if add not in fc:
-            fc += add
-            put_rf('/etc/postgresql/9.1/main/pg_hba.conf', fc, use_sudo=True)
-        sudo('chown postgres.postgres ' + pg_hba)
+        append(pg_hba, add)
     finally:
         sudo("chmod 640 " + pg_hba)
     
@@ -93,19 +71,14 @@ def install_nova(ip, net, net_prefix, lvm_dev,
     psql(cmd.format(dbpasswd))
     
     glance_tempo_file = get_tfile()
-    sudo("cp /etc/glance/glance-registry.conf " + glance_tempo_file)
-    
+
     replace_in_file(glance_tempo_file,
             'sql_connection = .*?$',
             'sql_connection = postgresql://glancedbadmin:{0}@{1}/glance'\
                                 .format(dbpasswd,ip),
             use_sudo=True)
     
-    sudo("cp {0} /etc/glance/glance-registry.conf ".format(glance_tempo_file))
-    sudo("rm " + glance_tempo_file)
-    
     sudo('restart glance-registry')
-
     
     install('rabbitmq-server,nova-common,nova-doc,python-nova,nova-api,' + \
       'nova-network,nova-volume,nova-objectstore,nova-scheduler,' + \
@@ -118,13 +91,10 @@ def install_nova(ip, net, net_prefix, lvm_dev,
     
     psql(cmd.format(dbpasswd))
 
-
     cfg = nova_config.format(ip, net, '8', dbpasswd, net_prefix)
     put_rf('/etc/nova/nova.conf', cfg, use_sudo=True)
-    
 
     install('iscsitarget,iscsitarget-dkms')
-    
 
     sudo("sed -i 's/false/true/g' /etc/default/iscsitarget")
     sudo("service iscsitarget restart")
