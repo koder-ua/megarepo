@@ -1,0 +1,9 @@
+vm = LXCDomain.construct(conn,
+                         True,
+                         'oneiric',
+                         1024 * 1024,
+                         2,
+                         FileSystemDevice(
+                            '/mnt/lxc/ubuntu_oneiric/rootfs'),
+                         ETHNetworkDevice('4A:59:43:49:79:BF',
+                                          "vnet7", ip='192.168.122.10'))

@@ -8,12 +8,14 @@ def users():
     fl = get_rf('/etc/passwd')
     for i in fl.split('\n'):
         yield i.split(':',1)
+        
 
 def disable_udev_eth_rename():
     fc = 'SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ' + \
          'ATTR{address}=="*", ATTR{dev_id}=="0x0", ATTR{type}=="1", ' + \
          'KERNEL=="eth*", NAME="eth0"\n'
     put_rf('/etc/udev/rules.d/70-persistent-net.rules', fc, use_sudo=True)
+
 
 def allow_all_sudo_no_passwd():
     sudo('sudo cp /etc/sudoers /tmp/sudoers')

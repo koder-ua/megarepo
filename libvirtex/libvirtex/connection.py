@@ -133,17 +133,17 @@ class virDomainEx(libvirt.virDomain):
 
     @classmethod
     def commonDevices(cls, root, cfg):
-                with root.serial(type='pty'):
-                    root.target(port='0')
-                
-                with root.console(type='pty'):
-                    root.target(port='0')
-                
-                root.input(bus=ps2, type=mouse)
-                root.graphics(autoport='yes', 
-                              keymap='en-us', 
-                              type='vnc', 
-                              port='-1')
+        with root.serial(type='pty'):
+            root.target(port='0')
+        
+        with root.console(type='pty'):
+            root.target(port='0')
+        
+        root.input(bus='ps2', type='mouse')
+        root.graphics(autoport='yes', 
+                      keymap='en-us', 
+                      type='vnc', 
+                      port='-1')
 
     @classmethod
     def makeXML(cls, name, memory, vcpu, *devices):

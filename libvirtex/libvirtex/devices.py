@@ -83,7 +83,7 @@ class HDDBlockDevice(Device):
         with root.disk(device=self.device, type='block'):
             root.driver(type=self.type_, name=self.driver)
             root.source(dev=self.dev_path)
-            root.boot
+            #root.boot
             root.target(bus=self.bus, dev=self.dev)
 
 class HDDFileDevice(Device):
@@ -108,6 +108,6 @@ class HDDFileDevice(Device):
         with root.disk(device=self.device, type='file'):
             root.driver(type=self.type_, name=self.driver)
             root.source(file=self.image_path)
-            root.boot
+            #root.boot
             root.target(bus=self.bus, dev=self.dev)
 

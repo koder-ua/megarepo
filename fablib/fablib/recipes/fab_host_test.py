@@ -13,10 +13,12 @@ from fabric.contrib.files import exists
 from fabric.operations import put
 from fablib.core import *
 from fablib.executors import FabCmdExecutor
-from little_cloud.fab_recipes.vm_fab import vm2hosts
 
-set_hosts(vm2hosts('ubuntu', 'ubuntu'))
+#from little_cloud.fab_recipes.vm_fab import vm2hosts
+#set_hosts(vm2hosts('ubuntu', 'ubuntu'))
 #set_hosts(["koder:koder@koder-laptop"])
+
+set_hosts(env.hosts)
 
 class CouchDBStorage(object):
     def __init__(self, test_name, host='localhost', port=5984):
@@ -46,6 +48,8 @@ class CouchDBStorage(object):
             yield item.value
 
 
+@ensure('make')
+@ensure('gcc')
 def install_iozone():
     if not exists('/tmp/iozone'):
         with cd('/tmp'):

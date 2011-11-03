@@ -1,3 +1,5 @@
+import os
+
 import ipaddr
 import guestfs
 
@@ -19,6 +21,17 @@ broadcast {bcast}
 gateway {gw}
 """
 
+class LocalGuestFS(object):
+    def __init__(self, root):
+        self.root = root
+    
+    def write(self, fname, val):
+        open(os.path.join(self.root, fname), 'w').write(val)
+        
+    def read_file(self, path):
+        return open(os.path.join(self.root, fname), 'r').read()
+        
+    
 def set_image_network(image,
                       vm_name,
                       ip,
@@ -27,10 +40,13 @@ def set_image_network(image,
                       gw=None,
                       format='qcow2'):
  
-    g = guestfs.GuestFS ()
-    g.add_drive_opts(image, format=format)
-    g.launch()
-    g.mount(g.list_partitions()[0], '/')
+    if format == 'lxc':
+        g = LocalGuestFS(image)
+    else: 
+        g = guestfs.GuestFS()
+        g.add_drive_opts(image, format=format)
+        g.launch()
+        g.mount(g.list_partitions()[0], '/')
 
     #hostname
     g.write('/etc/hostname', vm_name)
@@ -86,7 +102,6 @@ def set_image_network(image,
     
     g.write('/etc/hosts', "\n".join(res))
 
-import os
 
 def mkimg(num):
     backing_store = '/home/koder/vm_images/ubuntu-kvm.qcow2'
@@ -101,4 +116,4 @@ def mkimg(num):
                       'nosql-{0}'.format(num),
                       '192.168.122.' + str(2 + num),
                       24)
-map(mkimg, [0, 1, 2, 3])
+#map(mkimg, [0, 1, 2, 3])

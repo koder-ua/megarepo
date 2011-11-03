@@ -1,3 +1,4 @@
+import os
 from libvirtex.connection import KVMDomain, LXCDomain
 from libvirtex.devices import HDDFileDevice, ETHNetworkDevice, FileSystemDevice, \
                     HDDBlockDevice, ETHBridgedDevice
@@ -103,6 +104,30 @@ class Sets(object):
                                    HDDFileDevice(ubuntu_img_path, 'qcow2'), 
                                    ETHNetworkDevice(hw, "vnet7", ip=ip))
         yield vm
+        
+    @provides('kvm', 'disk_test')
+    def mkvm_testvm(self, conn):
+        hw = '00:44:01:61:77:20'
+        ip = '192.168.122.13'
+    
+        fname = os.environ['TEST_VM_DIMAGE']
+        
+        if fname.endswith('qcow2'):
+            hdd = HDDFileDevice(fname, 'qcow2')
+        elif fname.endswith('raw'):
+            hdd = HDDFileDevice(fname, 'raw')
+        elif fname.startswith('/dev/'):
+            hdd = HDDBlockDevice(fname, 'raw')
+            
+        vm = KVMDomain.construct(conn,
+                                   True,
+                                   'disk_test_vm',
+                                   1024 * 1024,
+                                   1,
+                                   hdd, 
+                                   ETHNetworkDevice(hw, "vnet7", ip=ip))
+        yield vm
+    
 
     @provides('kvm', 'nosql')
     def mkvm_nosql(self, conn):
@@ -124,14 +149,10 @@ class Sets(object):
         for pos in range(len(ip_list)):    
     
             name = 'nosql-{0}'.format(pos)
-            if pos == 5:
-                dev = '/dev/vm_images/nosql-5'
-                hdd = HDDBlockDevice(dev, 'raw')
-            else:
-                ubuntu_img_path = \
-                        '/home/koder/vm_images/ubuntu-kvm-diff{0}.qcow2'\
-                                        .format(pos)
-                hdd = HDDFileDevice(ubuntu_img_path, 'qcow2')
+            ubuntu_img_path = \
+                    '/home/koder/vm_images/ubuntu-kvm-diff{0}.qcow2'\
+                                    .format(pos)
+            hdd = HDDFileDevice(ubuntu_img_path, 'qcow2')
             
             vm = KVMDomain.construct(conn,
                                        True,
