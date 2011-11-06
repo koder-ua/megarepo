@@ -4,7 +4,10 @@ This module contains general routines for fabric tool
 
 import os
 import re
+import json
+import uuid
 import contextlib
+
 from StringIO import StringIO
 
 from fabric.api import *
@@ -150,13 +153,15 @@ class ApgGetDebian(ApgGetUbuntu):
 
 def set_hosts(hosts):
     "set fab hosts from user:passwd@host form"
-    env.hosts = []
-    for host in hosts:
-        user_passwd, hostname = host.split('@',1)
-        user,passwd = user_passwd.split(':')
-        full_host = "{0}@{1}".format(user, hostname)
-        env.hosts.append(full_host)
-        env.passwords[full_host] = passwd
+    if not hasattr(env, 'hosts_parsed'):
+        env.hosts = []
+        for host in hosts:
+            user_passwd, hostname = host.split('@',1)
+            user,passwd = user_passwd.split(':')
+            full_host = "{0}@{1}".format(user, hostname)
+            env.hosts.append(full_host)
+            env.passwords[full_host] = passwd
+        env.hosts_parsed = True
 
 def curr_host():
     "return current host name"
@@ -309,6 +314,9 @@ def check(*cmds):
             return func(*dt, **mp)
         return cl2
     return closure
+
+def get_tfile(path_templ="/tmp/%s"):
+    return path_templ % (str(uuid.uuid1()),)
 
 @contextlib.contextmanager
 def remote_fl(path, use_sudo=False):

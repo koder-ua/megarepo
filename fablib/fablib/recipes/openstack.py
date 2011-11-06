@@ -1,17 +1,13 @@
 import os
-import uuid
 
 from fabric.api import *
 from fabric.context_managers import *
 from fabric.contrib.files import exists
 
 from fablib.core import provides, provides_pkg, ensure, install, check_cmd,\
-                        put_rf, get_rf, set_hosts, replace_in_file
+                        put_rf, get_rf, set_hosts, replace_in_file, get_tfile
 
 from fablib.fab_os import add_apt_sources
-
-def get_tfile():
-    return '/tmp/' + str(uuid.uuid1())
     
 def psql(cmd, user='postgres'):
     fname = get_tfile()

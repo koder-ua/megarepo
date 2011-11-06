@@ -55,8 +55,8 @@ def install_graphite_sensor(carbone_url, reload=False):
         sudo('supervisorctl start graphite_sensor')
         sudo('supervisorctl status graphite_sensor')
     
-    
-    
-    
+
+
+
 
 

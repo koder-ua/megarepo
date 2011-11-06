@@ -299,16 +299,15 @@ class VMConnector(object):
                 if cache_attr is not None:
                     setattr(self, cache_attr, ip)
                 return res
-            except socket.timeout:
+            except (socket.timeout, socket.error):
                 pass
 
     def wait_ssh_ready(self):
         while True:
             res = self.conn_ssh()
-
+        
             if res is not None:
                 return res
-
             time.sleep(1)
     
     def conn_ssh(self):
