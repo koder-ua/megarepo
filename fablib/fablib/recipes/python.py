@@ -20,9 +20,9 @@ class PIPInstaller(PackageManager):
 
 def py_install(module, ver = None):
     if ver is None:
-        PIPInstaller.install_package(module)
+        PIPInstaller.do_install_package(module)
     else:
-        PIPInstaller.install_package("{}=={}".format(module, ver))
+        PIPInstaller.do_install_package("{}=={}".format(module, ver))
 
 pip = py_install
 
