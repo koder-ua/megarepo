@@ -173,6 +173,16 @@ def dbbehcn():
             run('make')
             
             
+def to_bool(val):
+    if val == 'True':
+        return True
+    elif val == 'False':
+        return False
+    elif val not in (True, False):
+        raise RuntimeError("Unacceptable bool option value %r" % \
+                                (val,))
+    return val
+    
 def run_iozone(path, mark, storage="console",
                size=10, bsize=4, threads=1,
                with_sensor=False,
@@ -182,13 +192,8 @@ def run_iozone(path, mark, storage="console",
     bsize = int(bsize)
     threads = int(threads)
     
-    if with_sensor == 'True':
-        with_sensor = True
-    elif with_sensor == 'False':
-        with_sensor = False
-    elif with_sensor not in (True, False):
-        raise RuntimeError("Unacceptable with_sensor option value %r" % \
-                                (with_sensor,))
+    with_sensor = to_bool(with_sensor)
+    with_local_sensor = to_bool(with_local_sensor)
     
     parsed_res = do_run_iozone(path, size, bsize, threads,
                                with_sensor=with_sensor,

@@ -86,7 +86,7 @@ fab_cmd = 'fab --hosts={2} -f {0} {1}'
 RES_STR = 'RESULT :'
 
 tests = (
-    #(1, 4, 100),
+    #(1, 4, 100),   
     (1, 4, 1000),
     #(1, 40, 10000),
     #(1, 400, 10000),
@@ -204,27 +204,35 @@ def main(argv):
     
     res = "{storage_type:>10}    bsize ={bsize:>4}    fsize ={fsize:>7} " + \
           "threads ={threads:>2}   write ={write:>6}    " + \
-          "rewrite ={rewrite:>6} io = {wsum}+{rsum} " + \
-          "host_io = {hwsum}+{hrsum} wdev = {wdevps}" 
+          "rewrite ={rewrite:>6} io = {wsum}/{rsum} " + \
+          "host_io = {hwsum}/{hrsum} wdev = {wdevps}" 
 
     for result in it:
-        if 'io.wtps' not in result['sensor_res']:
-            print result['sensor_res']
-            mean, dev, w_sum, r_sum = 0, 0, 0, 0
-            hw_sum, hr_sum = 0, 0
+        if result['sensor_res'] is None:
+            mean, dev, w_sum, r_sum = '-', '-', '-', '-'
+        elif 'io.wtps' not in result['sensor_res']:
+            mean, dev, w_sum, r_sum = '-', '-', '-', '-'
         else:
             mean, dev = mean_and_dev(result['sensor_res']['io.wtps'])
-            w_sum = sum(result['sensor_res']['io.wtps'])
-            r_sum = sum(result['sensor_res']['io.rtps'])
-            hw_sum = sum(result['local_sensor_res']['io.wtps'])
-            hr_sum = sum(result['local_sensor_res']['io.rtps'])
+            w_sum = int(sum(result['sensor_res']['io.wtps']))
+            r_sum = int(sum(result['sensor_res']['io.rtps']))
+            mean = int(mean)
+            mean = int(mean)
 
-        print res.format(wmeanps=int(mean),
-                         wsum=int(w_sum),
-                         rsum=int(r_sum),
-                         hwsum=int(hw_sum),
-                         hrsum=int(hr_sum),
-                         wdevps=int(dev),
+        if result['local_sensor_res'] is None:
+            hw_sum, hr_sum = '-', '-'
+        elif 'io.wtps' not in result['local_sensor_res']:
+            hw_sum, hr_sum = '-', '-'
+        else:
+            hw_sum = int(sum(result['local_sensor_res']['io.wtps']))
+            hr_sum = int(sum(result['local_sensor_res']['io.rtps']))
+
+        print res.format(wmeanps=mean,
+                         wsum=w_sum,
+                         rsum=r_sum,
+                         hwsum=hw_sum,
+                         hrsum=hr_sum,
+                         wdevps=dev,
                          **result)
     
 if __name__ == "__main__":
