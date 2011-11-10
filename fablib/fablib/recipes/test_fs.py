@@ -5,6 +5,10 @@ import socket
 import contextlib
 import subprocess
 
+import fabric.api
+from fablib.core import set_hosts
+from fablib.recipes.fab_host_test import run_iozone
+
 import logging
 logger = logging
 logging.basicConfig(level=logging.ERROR)
@@ -115,14 +119,19 @@ def run_tests(storage_type, hosts):
                           format=storage_type,
                           loc_sensor=loc_sensor)
         
-        res = subprocess.check_output(
-                    fab_cmd.format(fab_file, ncmd, hosts),
-                                  shell=True)
-        data = None
-        for line in res.split('\n'):
-            if RES_STR in line:
-                data = json.loads(line[line.index(RES_STR) + len(RES_STR):])
-    
+        set_hosts([hosts], force=True)
+        results = {}
+        data = fabric.api.execute(run_iozone,
+                        fname, storage_type,
+                        storage=None,
+                        size=sz, bsize=bsz,
+                        threads=threads,
+                        with_local_sensor=False,
+                        with_sensor=True,
+                        results=results)
+        
+        data = results.values()[0]
+        
         data['storage_type'] = storage_type
         data['image'] = fname
         

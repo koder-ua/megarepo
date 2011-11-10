@@ -164,15 +164,35 @@ def get_storage(name, subname):
 @ensure('git')
 @ensure_pkg('autoconf')
 @ensure_pkg('libpopt-dev')
-def dbbehcn():
+def install_dbench_from_source():
     with cd('/tmp'):
-        run('git clone git://git.samba.org/sahlberg/dbench.git dbench')
+        prun('dbench',
+             'git clone git://git.samba.org/sahlberg/dbench.git dbench')
+        
         with cd('dbench'):
-            run('./autoconf.sh')
-            run('./configure')
-            run('make')
-            
-            
+            if not exists('dbench'):
+                prun('configure', './autogen.sh')
+                prun('Makefile', './configure')
+                run('make')
+    return '/tmp/dbench/dbench', '/tmp/dbench/loadfiles'
+
+def install_dbench():
+    install('dbench')
+    return which('dbench'), '/usr/share/dbench'
+    
+def run_dbench(loadfile, procs, tlimit=180):
+    dpath, lpath = install_dbench()
+    loadfile = os.path.join(lpath, loadfile)
+    res = run('{0} -c {loadfile} -t {tlimit} {procs}'.format(
+                                               dpath, loadfile=loadfile,
+                                               tlimit=tlimit, procs=procs))
+    
+    res_re = re.compile(r"Throughput\s(?P<tps>[\d.]+)\sMB/sec")
+    for line in res.split('\n'):
+        rr = res_re.match(line)
+        if rr:
+            print "Tp =", rr.group('tps')
+   
 def to_bool(val):
     if val == 'True':
         return True
@@ -186,7 +206,8 @@ def to_bool(val):
 def run_iozone(path, mark, storage="console",
                size=10, bsize=4, threads=1,
                with_sensor=False,
-               with_local_sensor=False):
+               with_local_sensor=False,
+               results=None):
     
     size = int(size)
     bsize = int(bsize)
@@ -207,6 +228,10 @@ def run_iozone(path, mark, storage="console",
     parsed_res['mark'] = mark.split('/')
 
     get_storage(storage, 'iozone')(parsed_res)
+    
+    if results is not None:
+        results[curr_host()] = parsed_res
+    
     return parsed_res
 
 def parse_sensor_file(fc):
@@ -289,8 +314,12 @@ def run_local_sensor(opts):
     sensor_result.update(parse_sensor_file(fc))
     
 
-def do_run_iozone(path, size, bsize, threads, with_sensor=False,
-                                              with_local_sensor=False):
+def do_run_iozone(path, size, bsize, threads,
+                  with_sensor=False,
+                  with_local_sensor=False,
+                  sync=True,
+                  seq_write=True,
+                  random_write=False):
     
     iozone_exec = install_iozone()
     
@@ -304,16 +333,34 @@ def do_run_iozone(path, size, bsize, threads, with_sensor=False,
             path = path % (0,)
         path_opt = '-f {0}'.format(path)
         
-    cmd = '{0} -o -i 0 {1} -s {2} -r {3} {4}'.format(
-                                    iozone_exec, 
-                                    threads_opt,
-                                    size, 
-                                    bsize, 
-                                    path_opt)
+    if sync:
+        sync = '-o'
+    else:
+        sync = ''
+    
+    tests = []
+    
+    if seq_write:
+        tests.append("0")
+    if random_write:
+        tests.append("2")
+    
+    tests = " ".join("-i " + test for test in tests)
+        
+    cmd = '{iozone_exec} {sync} {tests} {th} -s {size} -r {bsize} {fpath}'.\
+                    format(iozone_exec=iozone_exec, 
+                           th=threads_opt,
+                           size=size, 
+                           bsize=bsize,
+                           tests=tests,
+                           fpath=path_opt,
+                           sync=sync)
     
     sensor_result = None
     local_sensor_result = None
 
+    print ">>>>", with_sensor, with_local_sensor
+    
     if with_sensor and with_local_sensor:
         with run_sensor("io") as sensor_result:
             with run_local_sensor("io") as local_sensor_result:

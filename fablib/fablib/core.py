@@ -162,9 +162,9 @@ class ApgGetDebian(ApgGetUbuntu):
             super(ApgGetDebian, cls).do_install_package(requirement)
 
 
-def set_hosts(hosts):
+def set_hosts(hosts, force=False):
     "set fab hosts from user:passwd@host form"
-    if not hasattr(env, 'hosts_parsed'):
+    if not hasattr(env, 'hosts_parsed') or force:
         env.hosts = []
         for host in hosts:
             user_passwd, hostname = host.split('@',1)
@@ -526,7 +526,7 @@ def do_replace_in_file(fname, re1, re2, use_sudo):
 
 def make_remote_dir(path, use_sudo=False):
     cmd = sudo if use_sudo else run
-    return make_dir(path, exists, lambda dname : cmd('mkdir ' + dname))
+    cmd("mkdir -p " + path)
 
 
 def make_local_dir(path):
@@ -545,4 +545,12 @@ def make_dir(path, test_func, make_func):
     while parts != []:
         cpath = os.path.join(cpath, parts.pop())
         make_func(cpath)
+    
+def prun(file, cmd):
+    if not exists(file):
+        return run(cmd)
+
+def psudo(file, cmd):
+    if not exists(file):
+        return sudo(cmd)
     
