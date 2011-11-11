@@ -463,8 +463,8 @@ def check_access(fname, test_oper, use_sudo=False):
     return not res.failed
 
 
-def get_tfile():
-    return '/tmp/' + str(uuid.uuid1())
+def get_tfile(template="/tmp/{0}"):
+    return template.format(str(uuid.uuid1()))
 
 
 def replace_in_file(fname, re1, re2, use_sudo=False):
@@ -553,4 +553,14 @@ def prun(file, cmd):
 def psudo(file, cmd):
     if not exists(file):
         return sudo(cmd)
-    
+
+def to_bool(val):
+    if val == 'True':
+        return True
+    elif val == 'False':
+        return False
+    elif val not in (True, False):
+        raise RuntimeError("Unacceptable bool option value %r" % \
+                                (val,))
+    return val
+
