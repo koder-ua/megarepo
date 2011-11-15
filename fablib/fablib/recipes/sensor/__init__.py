@@ -4,17 +4,20 @@ import sys
 import time
 import contextlib
 
-
 from fabric.api import *
 from fabric.contrib.files import exists
 from fabric.operations import put
+from fablib.core import get_tfile, get_rf, curr_host
 
+data_re = re.compile(r"(?P<opt>\w+\.\w+)\s+(?P<val>\d+(?:\.\d+)?)\s*$")
 def parse_sensor_file(fc):
     sensor_result = {}
     for line in fc.split('\n')[1:]:
-        if line.strip():
-            opt, val = line.split(' ')
-            sensor_result.setdefault(opt,[]).append(float(val))
+        rr = data_re.match(line.strip())
+        if rr:
+            opt = rr.group('opt')
+            val = float(rr.group('val'))
+            sensor_result.setdefault(opt,[]).append(val)
     return sensor_result
 
 def get_sensor_nohup_cmd(sensor_dir, opts):
@@ -40,7 +43,7 @@ def get_sensor_nohup_cmd(sensor_dir, opts):
 def run_sensor(opts):
     
     sensor_files_dst = '/tmp/'
-    sensor_file_src = os.path.dirname(sensor.__file__)
+    sensor_file_src = os.path.dirname(__file__)
     sensor_files = ['sar', 'sadc']
 
     for fname in sensor_files:
@@ -59,19 +62,19 @@ def run_sensor(opts):
     try:
         yield sensor_result
         fc = get_rf(sensor_output_file)
+        sensor_result.update(parse_sensor_file(fc))
     finally:
         with settings(hide('warnings', 'stderr'), warn_only=True):
             run('killall sar')
             run('rm -f ' + sensor_output_file)
     
-    sensor_result.update(parse_sensor_file(fc))
 
 
 @contextlib.contextmanager
 def run_local_sensor(opts):
     
     cmd_line, sensor_output_file = \
-            get_sensor_nohup_cmd(os.path.dirname(sensor.__file__),
+            get_sensor_nohup_cmd(os.path.dirname(__file__),
                                 opts)
     
     local(cmd_line)
@@ -81,12 +84,12 @@ def run_local_sensor(opts):
     try:
         yield sensor_result
         fc = open(sensor_output_file).read()
+        sensor_result.update(parse_sensor_file(fc))
     finally:
         with settings(hide('warnings', 'stderr'), warn_only=True):
             local('killall sar')
             os.unlink(sensor_output_file)
-
-    sensor_result.update(parse_sensor_file(fc))
+    
     
 def sensor_provider(func):
     def closure(*dt, **mp):
@@ -100,14 +103,14 @@ def sensor_provider(func):
         remote_sensor_result = None
         
         if local_sensor and remote_sensor:
-            with run_sensor("io") as remote_sensor_result:
-                with run_local_sensor("io") as local_sensor_result:
+            with run_sensor(remote_sensor) as remote_sensor_result:
+                with run_local_sensor(local_sensor) as local_sensor_result:
                     it.next()
         elif remote_sensor:
-            with run_sensor("io") as remote_sensor_result:
+            with run_sensor(remote_sensor) as remote_sensor_result:
                 it.next()
         elif local_sensor:
-            with run_local_sensor("io") as local_sensor_result:
+            with run_local_sensor(local_sensor) as local_sensor_result:
                 it.next()
         else:
             it.next()

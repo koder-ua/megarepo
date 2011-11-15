@@ -1,14 +1,8 @@
 import os
 
-from fablib.recipes import sensor
-
-from fabric.api import *
-from fabric.context_managers import *
-from fabric.contrib.files import exists, contains, append
-
 from fablib.core import *
-from fablib.recipes.python import pip
-from fablib.recipes.general import install_supervisord, add_supervisor_prog
+from fablib.recipes import sensor
+from fablib.recipes.supervisord import install_supervisord, add_supervisor_prog
 
 sensor_source = os.path.dirname(sensor.__file__)
 

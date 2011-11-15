@@ -8,7 +8,7 @@ from fablib.core import provides, provides_pkg, ensure, install, check_cmd,\
                         put_rf, get_rf
 
 from fablib.fab_os import add_apt_sources
-from fablib.wget import wget
+from fablib.recipes.wget import wget
 
 def install_deb_java():
     install_deb_java_jdk()

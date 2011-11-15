@@ -1,3 +1,6 @@
+# run iozone disk io tests
+# see http://www.iozone.org/ for more detailes
+
 import re
 import time
 
@@ -6,19 +9,28 @@ from fablib.recipes.sensor import sensor_provider
 
 @ensure('make')
 @ensure('gcc')
-def install_iozone():
+def install_iozone_source(ver="3_397"):
+    "install iozone from source"
     if not exists('/tmp/iozone'):
         with cd('/tmp'):
-            run('rm -f iozone3_397.tar')
-            run('rm -rf iozone3_397')
-            run('wget http://www.iozone.org/src/current/iozone3_397.tar')
-            run('tar xf iozone3_397.tar')
-            with cd('iozone3_397/src/current'):
+            run('rm -f iozone{0}.tar'.format(ver))
+            run('rm -rf iozone{0}'.format(ver))
+            run('wget http://www.iozone.org/src/current/iozone{0}.tar'\
+                        .format(ver))
+            run('tar xf iozone{0}.tar'.format(ver))
+            with cd('iozone{0}/src/current'.format(ver)):
                 run('make linux-AMD64')
                 run('cp iozone /tmp')
     return '/tmp/iozone'
 
+@ensure('iozone3')
+def install_iozone():
+    "install iozone package"
+    return which('iozone')
+
 class IOZoneParser(object):
+    "class to parse iozone results"
+    
     start_tests = re.compile(r"^\s+KB\s+reclen\s+")
     resuts = re.compile(r"[\s0-9]+")
     mt_iozone_re = re.compile(r"\s+Children see throughput " + \
@@ -108,15 +120,33 @@ def iozone(path, mark,
                size=10, bsize=4, threads=1,
                remote_sensor=None,
                local_sensor=None,
-               results=None):
+               results=None,
+               **tests):
+    """
+    run iozone, parse results and return dict of results
+    params:
+    mark : '/' separated string
+    size : test file size in kb
+    bsize : test block size in kb
+    thread : number of threads to run
+    remote_sensor : string with sensor type to run on remote host
+                    for more info see fablib.recipes.sensor docs
+                    
+    local_sensor : string with sensor type to run on local host
+                    for more info see fablib.recipes.sensor docs
+    
+    results = {} or None. Will put results in this dict with key of
+                current host name
+    """
     
     size = int(size)
     bsize = int(bsize)
     threads = int(threads)
     
-    parsed_res = do_run_iozone(path, size, bsize, threads,
+    with settings(hide('stdout', 'stderr')):
+        parsed_res = do_run_iozone(path, size, bsize, threads,
                                remote_sensor=remote_sensor,
-                               local_sensor=local_sensor)
+                               local_sensor=local_sensor, **tests)
     
     parsed_res['bsize'] = bsize
     parsed_res['fsize'] = size
