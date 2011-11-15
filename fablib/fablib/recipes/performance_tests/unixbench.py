@@ -65,7 +65,7 @@ def result_parser(res):
     return data_dict
 
 @sensor_provider
-def unixtest(ver='5.1.3', results=None):
+def unixbench(ver='5.1.3', results=None):
     unixbench_dir = istall_unixbench_src(ver)
     with cd(unixbench_dir):
         yield
