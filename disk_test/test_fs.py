@@ -7,7 +7,7 @@ import subprocess
 
 import fabric.api
 from fablib.core import set_hosts
-from fablib.recipes.fab_host_test import run_iozone
+from fablib.recipes.performance_tests import iozone
 
 import logging
 logger = logging

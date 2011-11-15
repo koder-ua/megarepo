@@ -1,15 +1,18 @@
+__doc__ = """
+fabric recipe to install openstack
+"""
+
 import os
 
 from fabric.api import *
 from fabric.context_managers import *
-from fabric.contrib.files import exists, append
+from fabric.contrib.files import append
 
-from fablib.core import provides, provides_pkg, ensure, install, check_cmd,\
-                        put_rf, get_rf, set_hosts, replace_in_file,\
+from fablib.core import install, \
+                        put_rf, set_hosts, replace_in_file,\
                         get_tfile, upstart_restart
 
-from fablib.fab_os import add_apt_sources
-from fablib.recipes.postgres import psql    
+from fablib.recipes.sqldb.postgres import psql
     
 nova_config = """
 --dhcpbridge_flagfile=/etc/nova/nova.conf
@@ -160,9 +163,9 @@ def install_swift():
     
 def main():
     install_nova(ip='192.168.122.225',
-                      net='192.168.125.0/24',
-                      net_prefix='192.168.125.',
-                      lvm_dev='/dev/vdb',
-                      ext_network='192.168.126.0/24',
-                      proj_name='test')
+                 net='192.168.125.0/24',
+                 net_prefix='192.168.125.',
+                 lvm_dev='/dev/vdb',
+                 ext_network='192.168.126.0/24',
+                 proj_name='test')
 

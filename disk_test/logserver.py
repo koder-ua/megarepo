@@ -1,4 +1,5 @@
 __author__ = 'koder'
+import sys
 import socket
 import struct
 import pickle
@@ -6,22 +7,28 @@ import logging
 import logging.handlers
 import threading
 
+logging.basicConfig(level=logging.DEBUG)
+handler = logging.StreamHandler()
+handler.setLevel(logging.DEBUG)
+
 sz_obj = struct.Struct('>L')
+
 def socket_thread(sock):
     while True:
-        data_len_s = sock.recv(sz_obj.size())
+        data_len_s = sock.recv(sz_obj.size)
 
-        if len(data_len_s) != sz_obj.size():
+        if len(data_len_s) != sz_obj.size:
             return
 
-        data_len = sz_obj.unpack(data_len_s)
+        data_len = sz_obj.unpack(data_len_s)[0]
         data_s = sock.recv(data_len)
 
         if len(data_s) != data_len:
             return
 
         obj = pickle.loads(data_s)
-        logging.handle(obj)
+        handler.handle(logging.makeLogRecord(obj))
+
 
 def main(_argv):
     sock = socket.socket()
@@ -40,5 +47,7 @@ def main(_argv):
             th.daemon = True
             th.start()
 
+    return 0
+
 if __name__ == '__main__':
-    main()
+    sys.exit(main(sys.argv))

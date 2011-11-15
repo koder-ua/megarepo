@@ -2,16 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="792c397f-4705-4a84-a6aa-624e5e773b29" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/dictionaries/koder.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/disk_test/logserver.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/fablib/fablib/recipes/performance_tests/unixbench.py" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/fablib/fablib/recipes/fab_host_test.py" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fablib/fablib/recipes/install_monitoring.py" afterPath="$PROJECT_DIR$/fablib/fablib/recipes/install_monitoring.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fablib/fablib/recipes/java.py" afterPath="$PROJECT_DIR$/fablib/fablib/recipes/java.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fablib/fablib/recipes/performance_tests/__init__.py" afterPath="$PROJECT_DIR$/fablib/fablib/recipes/performance_tests/__init__.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fablib/fablib/recipes/performance_tests/iozone.py" afterPath="$PROJECT_DIR$/fablib/fablib/recipes/performance_tests/iozone.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fablib/fablib/recipes/sensor/__init__.py" afterPath="$PROJECT_DIR$/fablib/fablib/recipes/sensor/__init__.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fablib/fablib/unittest/host_test.py" afterPath="$PROJECT_DIR$/fablib/fablib/unittest/host_test.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/disk_test/test_log_server.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/fablib/fablib/recipes/test_fs.py" afterPath="$PROJECT_DIR$/disk_test/test_fs.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/disk_test/logserver.py" afterPath="$PROJECT_DIR$/disk_test/logserver.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fablib/fablib/recipes/nosql/cassandra.py" afterPath="$PROJECT_DIR$/fablib/fablib/recipes/nosql/cassandra.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fablib/fablib/recipes/openstack.py" afterPath="$PROJECT_DIR$/fablib/fablib/recipes/openstack.py" />
     </list>
     <ignored path="packages.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -34,10 +30,10 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="dbench.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/fablib/fablib/recipes/performance_tests/dbench.py">
+      <file leaf-file-name="vm_sets.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/little_cloud/little_cloud/vm_sets.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="9" column="33" selection-start="217" selection-end="217" vertical-scroll-proportion="0.0">
+            <state line="13" column="16" selection-start="413" selection-end="413" vertical-scroll-proportion="0.0">
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -45,65 +41,41 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="fhourstones.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/fablib/fablib/recipes/performance_tests/fhourstones.py">
+      <file leaf-file-name="vmfs.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/little_cloud/little_cloud/vmfs.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+            <state line="21" column="3" selection-start="301" selection-end="301" vertical-scroll-proportion="0.0">
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="iozone.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/fablib/fablib/recipes/performance_tests/iozone.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-              <folding>
-                <element signature="e#75#84#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="unixbench.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/fablib/fablib/recipes/performance_tests/unixbench.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-              <folding>
-                <element signature="e#0#25#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="__init__.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/fablib/fablib/recipes/performance_tests/__init__.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="4" column="0" selection-start="120" selection-end="120" vertical-scroll-proportion="0.0">
-              <folding>
-                <element signature="e#0#35#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file leaf-file-name="storage.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/fablib/fablib/recipes/performance_tests/storage.py">
+        <entry file="file://$PROJECT_DIR$/little_cloud/little_cloud/storage.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="32" column="31" selection-start="972" selection-end="972" vertical-scroll-proportion="0.0">
+            <state line="21" column="8" selection-start="527" selection-end="527" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="openstack.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/fablib/fablib/recipes/openstack.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="26" column="13" selection-start="626" selection-end="626" vertical-scroll-proportion="0.0">
               <folding>
-                <element signature="e#0#11#0" expanded="true" />
+                <element signature="e#54#63#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="sar2graphite.py" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/fablib/fablib/recipes/sensor/sar2graphite.py">
+      <file leaf-file-name="install_monitoring.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/fablib/fablib/recipes/install_monitoring.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="21" column="47" selection-start="463" selection-end="463" vertical-scroll-proportion="0.0">
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -111,21 +83,12 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="main.pyx" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/disk_test/main.pyx">
+      <file leaf-file-name="mongodb.py" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/fablib/fablib/recipes/nosql/mongodb.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="logserver.py" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/disk_test/logserver.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="13" column="8" selection-start="245" selection-end="245" vertical-scroll-proportion="0.39891696">
+            <state line="12" column="0" selection-start="480" selection-end="480" vertical-scroll-proportion="0.3529412">
               <folding>
-                <element signature="e#21#34#0" expanded="true" />
+                <element signature="e#0#27#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -149,7 +112,11 @@
         <option value="$PROJECT_DIR$/fablib/fablib/recipes/install_monitoring.py" />
         <option value="$PROJECT_DIR$/fablib/fablib/recipes/java.py" />
         <option value="$PROJECT_DIR$/fablib/fablib/recipes/performance_tests/__init__.py" />
+        <option value="$PROJECT_DIR$/disk_test/test_fs.py" />
         <option value="$PROJECT_DIR$/disk_test/logserver.py" />
+        <option value="$PROJECT_DIR$/disk_test/test_log_server.py" />
+        <option value="$PROJECT_DIR$/fablib/fablib/recipes/openstack.py" />
+        <option value="$PROJECT_DIR$/fablib/fablib/recipes/nosql/cassandra.py" />
       </list>
     </option>
   </component>
@@ -201,6 +168,126 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="packages" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="packages" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="packages" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="little_cloud" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="packages" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="packages" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="fablib" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="packages" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="packages" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="fablib" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="fablib" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="packages" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="packages" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="fablib" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="fablib" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="recipes" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="packages" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="packages" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="fablib" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="fablib" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="recipes" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="sqldb" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="packages" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="packages" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="fablib" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="fablib" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="recipes" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="nosql" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -394,45 +481,59 @@
     <breakpoint-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/fablib/fablib/recipes/install_monitoring.py">
+    <entry file="file://$PROJECT_DIR$/little_cloud/little_cloud/pr_stats.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="19" column="40" selection-start="499" selection-end="499" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fablib/fablib/recipes/java.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="10" column="20" selection-start="294" selection-end="294" vertical-scroll-proportion="0.0">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="-1.0369686">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/fablib/fablib/recipes/performance_tests/iozone.py">
+    <entry file="file://$PROJECT_DIR$/disk_test/logserver.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+        <state line="14" column="0" selection-start="268" selection-end="268" vertical-scroll-proportion="0.4296029">
           <folding>
-            <element signature="e#75#84#0" expanded="true" />
+            <element signature="e#21#31#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/fablib/fablib/recipes/performance_tests/fhourstones.py">
+    <entry file="file://$PROJECT_DIR$/fablib/fablib/recipes/sensor/sar2graphite.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+        <state line="27" column="0" selection-start="642" selection-end="642" vertical-scroll-proportion="-0.07400722">
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/fablib/fablib/recipes/performance_tests/dbench.py">
+    <entry file="file://$PROJECT_DIR$/fablib/fablib/recipes/performance_tests/storage.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="9" column="33" selection-start="217" selection-end="217" vertical-scroll-proportion="0.0">
+        <state line="32" column="31" selection-start="972" selection-end="972" vertical-scroll-proportion="0.9411765">
           <folding>
-            <element signature="e#0#9#0" expanded="true" />
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/disk_test/test_fs.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="9" column="45" selection-start="181" selection-end="181" vertical-scroll-proportion="0.27079645">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/disk_test/main.pyx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="4" column="25" selection-start="98" selection-end="98" vertical-scroll-proportion="0.11764706">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fablib/fablib/recipes/performance_tests/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="4" column="0" selection-start="120" selection-end="120" vertical-scroll-proportion="0.11764706">
+          <folding>
+            <element signature="e#0#35#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -446,45 +547,70 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/fablib/fablib/recipes/performance_tests/__init__.py">
+    <entry file="file://$PROJECT_DIR$/fablib/fablib/recipes/performance_tests/dbench.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="4" column="0" selection-start="120" selection-end="120" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="e#0#35#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fablib/fablib/recipes/performance_tests/storage.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="32" column="31" selection-start="972" selection-end="972" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fablib/fablib/recipes/sensor/sar2graphite.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="21" column="47" selection-start="463" selection-end="463" vertical-scroll-proportion="0.0">
+        <state line="9" column="33" selection-start="217" selection-end="217" vertical-scroll-proportion="0.2647059">
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/disk_test/main.pyx">
+    <entry file="file://$PROJECT_DIR$/little_cloud/little_cloud/vm_sets.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+        <state line="13" column="16" selection-start="413" selection-end="413" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/little_cloud/little_cloud/vmfs.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="21" column="3" selection-start="301" selection-end="301" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/little_cloud/little_cloud/storage.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="21" column="8" selection-start="527" selection-end="527" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/disk_test/logserver.py">
+    <entry file="file://$PROJECT_DIR$/fablib/fablib/recipes/openstack.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="13" column="8" selection-start="245" selection-end="245" vertical-scroll-proportion="0.39891696">
+        <state line="26" column="13" selection-start="626" selection-end="626" vertical-scroll-proportion="0.0">
           <folding>
-            <element signature="e#21#34#0" expanded="true" />
+            <element signature="e#54#63#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fablib/fablib/recipes/nosql/cassandra.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="7" column="24" selection-start="149" selection-end="149" vertical-scroll-proportion="0.11764706">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fablib/fablib/recipes/install_monitoring.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fablib/fablib/recipes/nosql/mongodb.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="12" column="0" selection-start="480" selection-end="480" vertical-scroll-proportion="0.3529412">
+          <folding>
+            <element signature="e#0#27#0" expanded="true" />
           </folding>
         </state>
       </provider>

@@ -5,8 +5,8 @@ from fabric.api import *
 from fabric.context_managers import *
 from fabric.contrib.files import exists
 
-from fablib.core import ensure, replace_in_file, check_cmd, install
-from fablib.wget import wget
+from fablib.core import check_cmd, install
+from fablib.recipes.wget import wget
 from fablib.fab_os import add_apt_sources
 
 def install_src(ver='0.8.7'):
