@@ -1,13 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="792c397f-4705-4a84-a6aa-624e5e773b29" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/disk_test/disk_image.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/disk_test/easy_opt.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/disk_test/test_fs.py" afterPath="$PROJECT_DIR$/disk_test/test_fs.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fablib/fablib/recipes/performance_tests/unixbench.py" afterPath="$PROJECT_DIR$/fablib/fablib/recipes/performance_tests/unixbench.py" />
-    </list>
+    <list default="true" id="792c397f-4705-4a84-a6aa-624e5e773b29" name="Default" comment="" />
     <ignored path="packages.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -32,7 +26,7 @@
       <file leaf-file-name="test_fs.py" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/disk_test/test_fs.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="81" column="20" selection-start="2168" selection-end="2168" vertical-scroll-proportion="0.4392361">
+            <state line="75" column="25" selection-start="1888" selection-end="1888" vertical-scroll-proportion="0.2621528">
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
               </folding>
@@ -609,7 +603,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/disk_test/test_fs.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="81" column="20" selection-start="2168" selection-end="2168" vertical-scroll-proportion="0.4392361">
+        <state line="75" column="25" selection-start="1888" selection-end="1888" vertical-scroll-proportion="0.2621528">
           <folding>
             <element signature="e#0#10#0" expanded="true" />
           </folding>

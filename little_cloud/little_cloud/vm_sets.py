@@ -129,6 +129,22 @@ class Sets(object):
         yield vm
     
 
+    @provides('kvm', 'nova')
+    def mkvm_nova(self, conn):
+        hw = '00:44:01:61:78:01'
+        ip = '192.168.122.225'
+        fpath = '/home/koder/vm_images/ubuntu-server-nova-1.qcow2'
+        vm = KVMDomain.construct(conn,
+                                 True,
+                                 'nova',
+                                 1024 * 1024,
+                                 1,
+                                 HDDFileDevice(fpath, 'qcow2'),
+                                 HDDBlockDevice('/dev/vm_images/nova_images',
+                                                dev='vdb'),
+                                 ETHNetworkDevice(hw, "vnet7", ip=ip))
+        yield vm
+
     @provides('kvm', 'nosql')
     def mkvm_nosql(self, conn):
         hw_list = ['00:44:01:61:76:f7',

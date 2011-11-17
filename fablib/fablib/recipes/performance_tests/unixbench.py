@@ -20,7 +20,7 @@ def istall_unixbench_src(ver='5.1.3'):
                 run('make')
     return "/tmp/UnixBench"
         
-proc_count_re = re.compile(r"\d+\s+CPUs\s+in\s+system;\s+running\s+" + \
+proc_count_re = re.compile(r"\d+\s+CPUs?\s+in\s+system;\s+running\s+" + \
                            r"(?P<proc_count>\d+)" + \
                            r"\s+parallel\s+cop(?:y|ies)\s+of\s+tests\s*$")
 start_line_re = re.compile(r"System\s+Benchmarks\s+Index" + \

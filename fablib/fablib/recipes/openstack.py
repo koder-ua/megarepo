@@ -14,6 +14,8 @@ from fablib.core import install, \
 
 from fablib.recipes.sqldb.postgres import psql
     
+set_hosts(['ubuntu:ubuntu@nova'])
+
 nova_config = """
 --dhcpbridge_flagfile=/etc/nova/nova.conf
 --dhcpbridge=/usr/bin/nova-dhcpbridge
@@ -39,14 +41,17 @@ nova_config = """
 --sql_connection=postgresql://novadbadmin:{3}@{0}/nova
 """
 
-set_hosts(['ubuntu:ubuntu@nova'])
-
-def install_nova(ip, net, net_prefix, lvm_dev,
-                      ext_network, proj_name,
-                      nova_adm='ubuntu',
-                      dbpasswd='nova'):
+def install_nova(ip,
+                 net,
+                 net_prefix,
+                 lvm_dev,
+                 ext_network,
+                 proj_name,
+                 nova_adm='ubuntu',
+                 dbpasswd='nova',
+                 compute_backend='lxc'):
     install('bridge-utils,postgresql,python-psycopg2')
-
+    
     replace_in_file("/etc/postgresql/9.1/main/postgresql.conf",
             "#listen_addresses\s+=\s+'localhost'(.*)",
             r"listen_addresses = '*'\1", use_sudo=True)
@@ -72,9 +77,7 @@ def install_nova(ip, net, net_prefix, lvm_dev,
     
     psql(cmd.format(dbpasswd))
     
-    glance_tempo_file = get_tfile()
-
-    replace_in_file(glance_tempo_file,
+    replace_in_file("/etc/glance/glance-registry.conf",
             'sql_connection = .*?$',
             'sql_connection = postgresql://glancedbadmin:{0}@{1}/glance'\
                                 .format(dbpasswd,ip),
@@ -84,7 +87,8 @@ def install_nova(ip, net, net_prefix, lvm_dev,
     
     install('rabbitmq-server,nova-common,nova-doc,python-nova,nova-api,' + \
       'nova-network,nova-volume,nova-objectstore,nova-scheduler,' + \
-      'nova-compute,euca2ools,unzip')
+      'nova-compute,euca2ools,unzip,nova-compute-' + compute_backend)
+    
     
     cmd = 'CREATE user novadbadmin;\n' + \
           "ALTER user novadbadmin with password '{0}';\n" + \
@@ -94,14 +98,17 @@ def install_nova(ip, net, net_prefix, lvm_dev,
     psql(cmd.format(dbpasswd))
 
     cfg = nova_config.format(ip, net, '8', dbpasswd, net_prefix)
-    put_rf('/etc/nova/nova.conf', cfg, use_sudo=True)
+    put_rf('/etc/nova/nova.conf', cfg , use_sudo=True)
 
-    install('iscsitarget,iscsitarget-dkms')
+    use_lvm = False
+    if use_lvm:
+        install('iscsitarget,iscsitarget-dkms')
+    
+        sudo("sed -i 's/false/true/g' /etc/default/iscsitarget")
+        sudo("service iscsitarget restart")
+        sudo("pvcreate " + lvm_dev)
+        sudo("vgcreate nova-volumes " + lvm_dev)
 
-    sudo("sed -i 's/false/true/g' /etc/default/iscsitarget")
-    sudo("service iscsitarget restart")
-    sudo("pvcreate " + lvm_dev)
-    sudo("vgcreate nova-volumes " + lvm_dev)
     sudo("chown -R root:nova /etc/nova")
     sudo("chmod 644 /etc/nova/nova.conf")
     

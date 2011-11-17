@@ -5,7 +5,7 @@ import guestfs
 
 from IPython import embed
 
-from vm_utils.utils import parce_hosts
+from vm_utils.utils import parse_hosts
 
 static_ip = """
 auto lo
@@ -32,22 +32,13 @@ class LocalGuestFS(object):
         return open(os.path.join(self.root, fname), 'r').read()
         
     
-def set_image_network(image,
+def set_image_network(g,
                       vm_name,
                       ip,
                       net_size,
                       add_to_hosts={},
-                      gw=None,
-                      format='qcow2'):
+                      gw=None):
  
-    if format == 'lxc':
-        g = LocalGuestFS(image)
-    else: 
-        g = guestfs.GuestFS()
-        g.add_drive_opts(image, format=format)
-        g.launch()
-        g.mount(g.list_partitions()[0], '/')
-
     #hostname
     g.write('/etc/hostname', vm_name)
     
@@ -76,7 +67,7 @@ def set_image_network(image,
     
     radd_to_hosts = [(v, k) for k, v in add_to_hosts.items()]
     
-    for is_ip, obj in parce_hosts(g.read_file('/etc/hosts')):
+    for is_ip, obj in parse_hosts(g.read_file('/etc/hosts')):
         if not is_ip:
             res.append(obj)
         else:
@@ -102,6 +93,27 @@ def set_image_network(image,
     
     g.write('/etc/hosts', "\n".join(res))
 
+def set_all(image, format='qcow2'):
+    if format == 'lxc':
+        g = LocalGuestFS(image)
+    else: 
+        g = guestfs.GuestFS()
+        g.add_drive_opts(image, format=format)
+        g.launch()
+        #print g.list_partitions()
+        #print g.list_filesystems()
+        #return
+        g.mount('/dev/nova/root', '/')
+
+    #set_image_network(g,
+    #                  'nova',
+    #                  '192.168.122.225',
+    #                  24)
+    set_apt_cache_proxy(g, '192.168.122.1')    
+
+def set_apt_cache_proxy(g, ip):
+    fc = 'Acquire::http {{ Proxy "http://{0}:3142"; }};'.format(ip)
+    g.write('/etc/apt/apt.conf.d/02proxy', fc)
 
 def mkimg(num):
     backing_store = '/home/koder/vm_images/ubuntu-kvm.qcow2'
@@ -117,3 +129,4 @@ def mkimg(num):
                       '192.168.122.' + str(2 + num),
                       24)
 #map(mkimg, [0, 1, 2, 3])
+set_all('/home/koder/vm_images/ubuntu-server-nova.qcow2')

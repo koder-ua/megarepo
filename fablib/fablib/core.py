@@ -420,7 +420,7 @@ def get_file_cred(fname, use_sudo=False):
     return access_str_to_bin(access), user, group
 
 
-def copy_file_cred(sfname, dfname, owner_group=True, access=True, user_sudo=True):
+def copy_file_cred(sfname, dfname, owner_group=True, access=True, use_sudo=True):
     exec_me = sudo if use_sudo else run
     
     if access:
@@ -458,7 +458,7 @@ def check_access(fname, test_oper, use_sudo=False):
     exec_me = sudo if use_sudo else run
     
     with settings(hide('warnings'), warn_only=True):
-        res = exec_me('test {0} {1}'.format(test_oper, cmd))
+        res = exec_me('test {0} {1}'.format(test_oper, fname))
     
     return not res.failed
 
@@ -474,7 +474,7 @@ def replace_in_file(fname, re1, re2, use_sudo=False):
     except:
         pass
         
-    if not exists(fname):
+    if not exists(fname, use_sudo=use_sudo):
         raise RuntimeError("File {0} don't exists".format(fname))
     
     rights_ok = True
@@ -489,6 +489,8 @@ def replace_in_file(fname, re1, re2, use_sudo=False):
         if not use_sudo:
             raise RuntimeError("Can't write file {0}".format(fname))
         rights_ok = False
+    
+    print "rights_ok =", rights_ok
     
     if not rights_ok:
         t_fname = get_tfile()
