@@ -1,7 +1,4 @@
-from fabric.api import *
-from fabric.context_managers import *
-from fabric.contrib.files import exists, append
-
+from fabric.api import run, sudo
 from fablib.core import put_rf, get_tfile
 
 def psql(cmd, user='postgres'):

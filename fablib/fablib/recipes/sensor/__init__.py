@@ -39,10 +39,7 @@ def get_sensor_nohup_cmd(sensor_dir, opts):
     
     return " ".join(cmd_line), sensor_output_file
 
-@contextlib.contextmanager
-def run_sensor(opts):
-    
-    sensor_files_dst = '/tmp/'
+def put_sensor(sensor_files_dst='/tmp/'):
     sensor_file_src = os.path.dirname(__file__)
     sensor_files = ['sar', 'sadc']
 
@@ -53,42 +50,50 @@ def run_sensor(opts):
                 dst)
             run('chmod a+x ' + dst)
     
+def start_sensor(opts, run_func, tout=True):
+    
     cmd_line, sensor_output_file = get_sensor_nohup_cmd(sensor_files_dst, opts)
+    run_func(cmd_line)
+    
+    if tout:
+        time.sleep(0.1)
+    
+    return sensor_output_file 
 
-    run(cmd_line)
-    time.sleep(0.1)
+def stop_sensor(run_func, sensor_output_file):
+    with settings(hide('warnings', 'stderr'), warn_only=True):
+        run_func('killall sar')
+        run_func('rm -f ' + sensor_output_file)
+        
+def get_sensor_res(get_func, sensor_output_file):
+    fc = get_rf(sensor_output_file)
+    return parse_sensor_file(fc)
+
+@contextlib.contextmanager
+def run_sensor(opts):
+    put_sensor()
+    sensor_output_file = start_sensor(opts, run)
     sensor_result = {}
     
     try:
         yield sensor_result
-        fc = get_rf(sensor_output_file)
-        sensor_result.update(parse_sensor_file(fc))
+        sensor_result.update(get_sensor_res(get_rf, sensor_output_file))
     finally:
-        with settings(hide('warnings', 'stderr'), warn_only=True):
-            run('killall sar')
-            run('rm -f ' + sensor_output_file)
+        stop_sensor(run, sensor_output_file)
     
-
+get_lf = lambda fname : open(fname).read()
 
 @contextlib.contextmanager
 def run_local_sensor(opts):
     
-    cmd_line, sensor_output_file = \
-            get_sensor_nohup_cmd(os.path.dirname(__file__),
-                                opts)
-    
-    local(cmd_line)
-    time.sleep(0.1)
+    sensor_output_file = start_sensor(opts, local)
     sensor_result = {}
     
     try:
         yield sensor_result
-        fc = open(sensor_output_file).read()
-        sensor_result.update(parse_sensor_file(fc))
+        sensor_result.update(get_sensor_res(get_lf, sensor_output_file))
     finally:
-        with settings(hide('warnings', 'stderr'), warn_only=True):
-            local('killall sar')
-            os.unlink(sensor_output_file)
+        stop_sensor(local, sensor_output_file)
     
     
 def sensor_provider(func):
