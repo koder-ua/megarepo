@@ -68,7 +68,7 @@ def run_tests(storage_type, hosts):
         
         yield data
 
-def test_storage(image, storages, lvm_dev, make_vm):
+def test_storage(image, storages, tmp_files_dir, lvm_dev1, lvm_dev2, make_vm):
     for storage_type in storages.split(':'):
         if 'host' == storage_type:
             logger.info("Start host tests")
@@ -76,7 +76,11 @@ def test_storage(image, storages, lvm_dev, make_vm):
                 yield val
         else:
             logger.info("Create storage " + storage_type)
-            with make_image(image, storage_type, lvm_dev) as fname:
+            with make_image(image, 
+                            tmp_files_dir, 
+                            storage_type, 
+                            lvm_dev1=lvm_dev1, 
+                            lvm_dev2=lvm_dev2) as fname:
                 logger.info("Start vm on " + fname)
                 vm = make_vm(libvirtex_dtype(fname, storage_type))
                 try:
@@ -121,22 +125,25 @@ def main(argv):
 
     class Options(PyOptParser):
         vm_image = StrOpt()
-        lv_dev = StrOpt()
+        lv_dev1 = StrOpt()
+        lv_dev2 = StrOpt()
         storage_types = StrOpt()
 
     opts = Options.parse_opts()
 
     ip = '192.168.122.105'
     
-    all_storage_types = "qcow2:qcow:raw:qcow2_on_qcow2:qcow2_on_raw:qcow2_on_lvm"
-    all_storage_types += ":lvm:qcow2_in_lvm:qcow2_in_lvm_on_qcow2"
+    all_storage_types = "raw:lvm:qcow:qcow2:qcow2_on_raw:qcow2_on_lvm:qcow2_on_qcow2"
     
+        
     if 'all' == opts.storage_types:
         opts.storage_types = all_storage_types
     
     it = test_storage(opts.vm_image,
                       opts.storage_types,
-                      opts.lv_dev,
+                      '/tmp',
+                      lvm_dev1=opts.lv_dev1,
+                      lvm_dev2=opts.lv_dev2,
                       lambda x : make_vm(x, ip))
     
     res = "{storage_type:>10}    bsize ={bsize:>4}    fsize ={fsize:>7} " + \

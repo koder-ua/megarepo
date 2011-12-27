@@ -54,6 +54,8 @@ class virDomainEx(libvirt.virDomain):
     def construct(cls, conn, persistent, name, memory, vcpu, *devices):
         etree = cls.makeXML(name, memory, vcpu, *devices)
         
+        open("curr.xml","w").write(str(etree))
+        
         if conn.__class__ is libvirt.virConnect:
             self = conn.createXML(str(etree), 0)
         else:

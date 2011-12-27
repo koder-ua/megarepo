@@ -4,8 +4,6 @@ import struct
 import socket
 import platform
 
-# global constants.  If you don't like 'em here,
-# move 'em inside the function definition.
 SIOCGIFCONF = 0x8912
 MAXBYTES = 8096
 
@@ -18,9 +16,6 @@ def localifs():
         List of interface tuples.  Each tuple consists of
         (interface name, interface IP)
     """
-    global SIOCGIFCONF
-    global MAXBYTES
-
     arch = platform.architecture()[0]
 
     # I really don't know what to call these right now
