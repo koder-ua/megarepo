@@ -9,7 +9,7 @@ from fabric.contrib.files import exists
 from fabric.operations import put
 from fablib.core import get_tfile, get_rf, curr_host
 
-data_re = re.compile(r"(?P<opt>\w+\.\w+)\s+(?P<val>\d+(?:\.\d+)?)\s*$")
+data_re = re.compile(r"(?P<opt>[-\w.]+)\s+(?P<val>\d+(?:\.\d+)?)\s*$")
 def parse_sensor_file(fc):
     sensor_result = {}
     for line in fc.split('\n')[1:]:
@@ -32,6 +32,9 @@ def get_sensor_nohup_cmd(sensor_dir, opts):
         
     if 'io' in opts:
         cmd_line.append('-b')
+    
+    if 'iodev' in opts:
+        cmd_line.append('-d')
     
     sensor_output_file = get_tfile()
     

@@ -25,7 +25,7 @@ def wait_ssh_ready(ip):
             pass
 
 tests = (
-    #(1, 4, 100),   
+    #(1, 4, 100),
     (1, 4, 1000),
     #(1, 40, 10000),
     #(1, 400, 10000),
@@ -38,7 +38,7 @@ tests = (
     #(25, 40, 1000)
 )
 
-def run_tests(storage_type, hosts):
+def run_tests(storage_type, hosts, io_devs=None):
     for threads, bsz, sz in tests:
         if 1 == threads:
             fname = '/tmp/tt.bin'
@@ -58,8 +58,8 @@ def run_tests(storage_type, hosts):
                         size=sz,
                         bsize=bsz,
                         threads=threads,
-                        local_sensor='io',
-                        remote_sensor='io',
+                        local_sensor='io,iodev',
+                        remote_sensor='io,iodev',
                         results=results)
         
         fabric.network.disconnect_all()
@@ -122,11 +122,23 @@ def make_vm(hdd, ip, libvirt_url):
     return vm
 
 
-def mean_and_dev(lst):
-    mean = float(sum(lst)) / len(lst)
-    dev = (sum((x - mean) ** 2 for x in lst) / len(lst))  ** 0.5
-    return mean, dev
+class Stats(object):
+    def __init__(self):
+        self.mean = '-'
+        self.sum = '-'
+        self.dev = '-'
 
+def get_stats(arr):
+    res = Stats()
+    res.sum = sum(arr)
+    res.mean = float(res.sum) / len(arr)
+    res.dev = (sum((x - res.mean) ** 2 for x in arr) / len(arr))  ** 0.5
+
+    res.sum = int(res.sum)
+    res.mean = int(res.mean)
+    res.dev = int(res.dev)
+
+    return res
 
 def main(argv):
 
@@ -137,6 +149,8 @@ def main(argv):
         storage_types = StrOpt()
         ssh_creds = StrOpt(default='root:root@192.168.122.105')
         libvirt_url = StrOpt(default="qemu:///system")
+        remote_dev = StrOpt(default="")
+        local_dev = StrOpt(default="")
 
     opts = Options.parse_opts()
     
@@ -156,37 +170,61 @@ def main(argv):
                       lvm_dev2=opts.lv_dev2,
                       make_vm=lambda hdd : make_vm(hdd, ip, opts.libvirt_url))
     
-    res = "{storage_type:>10}    bsize ={bsize:>4}    fsize ={fsize:>7} " + \
+    res_format = "{storage_type:>10}    bsize ={bsize:>4}    fsize ={fsize:>7} " + \
           "threads ={threads:>2}   write ={write:>6}    " + \
           "rewrite ={rewrite:>6} io = {wsum}/{rsum} " + \
           "host_io = {hwsum}/{hrsum} wdev = {wdevps}" 
 
+    stats = {}
+
+    remote = 'remote_sensor_res'
+    local = 'local_sensor_res'
+
+    if opts.local_dev != "":
+        local_w = 'iodev.{0}.tps'.format(opts.local_dev)
+        local_r = 'no_data'
+    else:
+        local_r = 'io.rtps'
+        local_w = 'io.wtps'
+
+    if opts.remote_dev != "":
+        remote_w = 'iodev.{0}.tps'.format(opts.remote_dev)
+        remote_r = 'no_data'
+    else:
+        remote_r = 'io.rtps'
+        remote_w = 'io.wtps'
+
     for result in it:
-        if result['remote_sensor_res'] is None:
-            mean, dev, w_sum, r_sum = '-', '-', '-', '-'
-        elif 'io.wtps' not in result['remote_sensor_res']:
-            mean, dev, w_sum, r_sum = '-', '-', '-', '-'
-        else:
-            mean, dev = mean_and_dev(result['remote_sensor_res']['io.wtps'])
-            w_sum = int(sum(result['remote_sensor_res']['io.wtps']))
-            r_sum = int(sum(result['remote_sensor_res']['io.rtps']))
-            mean = int(mean)
-            dev = int(dev)
 
-        if result['local_sensor_res'] is None:
-            hw_sum, hr_sum = '-', '-'
-        elif 'io.wtps' not in result['local_sensor_res']:
-            hw_sum, hr_sum = '-', '-'
-        else:
-            hw_sum = int(sum(result['local_sensor_res']['io.wtps']))
-            hr_sum = int(sum(result['local_sensor_res']['io.rtps']))
+        #print result
+        
+        for key_1 in (remote, local):
+            
+            if key_1 == remote:
+                keys_2 = (remote_r, remote_w)
+            else:
+                keys_2 = (local_r, local_w)
 
-        print res.format(wmeanps=mean,
-                         wsum=w_sum,
-                         rsum=r_sum,
-                         hwsum=hw_sum,
-                         hrsum=hr_sum,
-                         wdevps=dev,
+            for key_2 in keys_2:
+                try:
+                    arr = result[key_1][key_2]
+                except KeyError:
+                    res = Stats()
+                else:
+                    res = get_stats(arr)
+                stats.setdefault(key_1,{})[key_2] = res
+
+        stats_w = stats[remote][remote_w]
+        stats_r = stats[remote][remote_r]
+        hstats_w = stats[local][local_w]
+        hstats_r = stats[local][local_r]
+
+        print res_format.format(wmeanps=stats_w.mean,
+                         wsum=stats_w.sum,
+                         rsum=stats_r.sum,
+                         wdevps=stats_w.dev,
+                         hwsum=hstats_w.sum,
+                         hrsum=hstats_r.sum,
                          **result)
     
 if __name__ == "__main__":
