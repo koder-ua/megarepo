@@ -10,7 +10,7 @@ def run(cmd):
     return subprocess.check_output(cmd, shell=True)
 
 @contextlib.contextmanager
-def make_image(src_file,
+def make_image(src_fname,
                tempo_files_dir,
                dst_format,
                qcow2_compress=False, 
@@ -45,7 +45,7 @@ def make_image(src_file,
 
     convert = lambda cmd : \
                     run("qemu-img convert -f qcow2 -O {0} {1} {2}".format(\
-                                cmd, src_file, dst_file))
+                                cmd, src_fname, dst_fname))
 
     opts = ""
 
@@ -57,34 +57,35 @@ def make_image(src_file,
         assert dst_format in ('qcow2', 'qcow2_on_raw', 'qcow2_on_qcow2')
         opts = opts + " -c " 
     
-    if storage_type == 'qcow2':
-        run('cp {0} {1}'.format(src_file, dst_file))
-    elif storage_type == 'qcow':
+    if dst_format == 'qcow2':
+        run('cp {0} {1}'.format(src_fname, dst_fname))
+    elif dst_format == 'qcow':
         convert('qcow')
-    elif storage_type == 'raw':
+    elif dst_format == 'raw':
         if is_dst_dev:
             convert("host_device")
         else:
             convert("raw")
-    elif storage_type == 'qcow2_on_qcow2':
-        run("qemu-img create {0} -f qcow2 -b {1} {2}".format(opts, src_file, dst_file))
-    elif storage_type == 'qcow2_on_raw':
+    elif dst_format == 'qcow2_on_qcow2':
+        run("qemu-img create {0} -f qcow2 -o backing_file={1} {2}".format(opts, src_fname, dst_fname))
+    elif dst_format == 'qcow2_on_raw':
 
         if is_bstore_dev:
             frmt = 'host_device'
         else:
             frmt = 'raw'
         
-        convert("qemu-img convert -f qcow2 -O {0} {1} {2}".format(frmt, src_file, bstore_raw))
-        run("qemu-img create {0} -f qcow2 -o backing_fmt=raw -b {1} {2}".format(
-                            opts, bstore_raw, dst_file))
+        run("qemu-img convert -f qcow2 -O {0} {1} {2}".format(frmt, src_fname, bstore_raw))
+        run("qemu-img create {0} -f qcow2 -o backing_fmt=raw,backing_file={1} {2}".format(
+                            opts, bstore_raw, dst_fname))
 
     else:
-        raise RuntimeError("Unknown storage type %r" % (storage_type,))
+        raise RuntimeError("Unknown storage type %r" % (dst_format,))
 
-    yield dst_file
-
-    map(os.unlink, rm_files)
+    try:
+        yield dst_fname
+    finally:
+        map(os.unlink, rm_files)
 
 
 def libvirtex_dtype(fname, storage_type):

@@ -87,9 +87,7 @@ class XMLNode(object):
                 raise ValueError(
                     "Non-named arguments should be string only, not %r" \
                                     % (arg,))
-                
         self.__childs.append("".join(args))
-    
         for key, val in kwargs.items():
             if not isinstance(val, basestring):
                 raise ValueError(

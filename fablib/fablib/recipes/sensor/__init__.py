@@ -50,7 +50,7 @@ def put_sensor(sensor_files_dst='/tmp/'):
                 dst)
             run('chmod a+x ' + dst)
     
-def start_sensor(opts, run_func, tout=True):
+def start_sensor(opts, run_func, sensor_files_dst='/tmp/', tout=True):
     
     cmd_line, sensor_output_file = get_sensor_nohup_cmd(sensor_files_dst, opts)
     run_func(cmd_line)
@@ -65,10 +65,6 @@ def stop_sensor(run_func, sensor_output_file):
         run_func('killall sar')
         run_func('rm -f ' + sensor_output_file)
         
-def get_sensor_res(get_func, sensor_output_file):
-    fc = get_rf(sensor_output_file)
-    return parse_sensor_file(fc)
-
 @contextlib.contextmanager
 def run_sensor(opts):
     put_sensor()
@@ -77,7 +73,7 @@ def run_sensor(opts):
     
     try:
         yield sensor_result
-        sensor_result.update(get_sensor_res(get_rf, sensor_output_file))
+        sensor_result.update(parse_sensor_file(get_rf(sensor_output_file)))
     finally:
         stop_sensor(run, sensor_output_file)
     
@@ -85,13 +81,12 @@ get_lf = lambda fname : open(fname).read()
 
 @contextlib.contextmanager
 def run_local_sensor(opts):
-    
-    sensor_output_file = start_sensor(opts, local)
+    sensor_output_file = start_sensor(opts, local, os.path.dirname(__file__))
     sensor_result = {}
     
     try:
         yield sensor_result
-        sensor_result.update(get_sensor_res(get_lf, sensor_output_file))
+        sensor_result.update(parse_sensor_file(open(sensor_output_file).read()))
     finally:
         stop_sensor(local, sensor_output_file)
     

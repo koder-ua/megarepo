@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<domain type="kvm">
+    <name>disk_test_vm</name>
+    <memory>1048576</memory>
+    <uuid />
+    <vcpu>1</vcpu>
+    <os>
+        <type>hvm</type>
+        <loader>/usr/lib/xen-default/boot/hvmloader</loader>
+        <boot dev="hd" />
+        <boot dev="cdrom" />
+        <bootmenu enable="yes" />
+        <bios useserial="yes" />
+    </os>
+    <clock sync="localtime" />
+    <on_poweroff>destroy</on_poweroff>
+    <on_reboot>restart</on_reboot>
+    <on_crash>destroy</on_crash>
+    <features>
+        <acpi />
+        <hap />
+        <apic />
+    </features>
+    <devices>
+        <emulator>/usr/bin/kvm</emulator>
+        <disk device="disk" type="file">
+            <driver name="qemu" type="qcow" />
+            <source file="/tmp/2faeebd6-3277-11e1-a7b5-14feb5b819a0" />
+            <target bus="virtio" dev="vda" />
+        </disk>
+        <interface type="network">
+            <source network="default" />
+            <forward mode="nat" />
+            <target dev="vnet7" />
+            <mac address="00:44:01:61:77:20" />
+        </interface>
+        <serial type="pty">
+            <target port="0" />
+        </serial>
+        <console type="pty">
+            <target port="0" />
+        </console>
+        <input bus="ps2" type="mouse" />
+        <graphics autoport="yes" keymap="en-us" port="-1" type="vnc" />
+    </devices>
+</domain>

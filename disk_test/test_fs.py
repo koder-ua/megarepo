@@ -4,6 +4,7 @@ import socket
 import fabric.api
 from fablib.core import set_hosts
 from fablib.recipes.performance_tests import iozone
+import fabric.network
 
 import logging
 
@@ -61,6 +62,7 @@ def run_tests(storage_type, hosts):
                         remote_sensor='io',
                         results=results)
         
+        fabric.network.disconnect_all()
         data = results.values()[0]
         
         data['storage_type'] = storage_type
@@ -68,7 +70,13 @@ def run_tests(storage_type, hosts):
         
         yield data
 
-def test_storage(image, storages, tmp_files_dir, lvm_dev1, lvm_dev2, make_vm):
+def test_storage(image,
+                 storages, 
+                 tmp_files_dir, 
+                 credentials, 
+                 lvm_dev1, 
+                 lvm_dev2, 
+                 make_vm):
     for storage_type in storages.split(':'):
         if 'host' == storage_type:
             logger.info("Start host tests")
@@ -86,8 +94,7 @@ def test_storage(image, storages, tmp_files_dir, lvm_dev1, lvm_dev2, make_vm):
                 try:
                     #do tests and collect results
                     logger.info("Run tests on vm")
-                    for res in run_tests(storage_type,
-                                         "ubuntu:ubuntu@192.168.122.105"):
+                    for res in run_tests(storage_type, credentials):
                         yield res
                 finally:
                     vm.destroy()
@@ -96,13 +103,13 @@ def test_host():
     for res in run_tests('host', "koder:koder@localhost"):
         yield res
 
-def make_vm(hdd, ip):
+def make_vm(hdd, ip, libvirt_url):
     from libvirtex.devices import ETHNetworkDevice
     from libvirtex.connection import open_libvirt, KVMDomain
 
     hw = '00:44:01:61:77:20'
     
-    vm = KVMDomain.construct(open_libvirt("qemu:///session"),
+    vm = KVMDomain.construct(open_libvirt(libvirt_url),
                                True,
                                'disk_test_vm',
                                1024 * 1024,
@@ -128,10 +135,10 @@ def main(argv):
         lv_dev1 = StrOpt()
         lv_dev2 = StrOpt()
         storage_types = StrOpt()
+        ssh_creds = StrOpt(default='root:root@192.168.122.105')
+        libvirt_url = StrOpt(default="qemu:///system")
 
     opts = Options.parse_opts()
-
-    ip = '192.168.122.105'
     
     all_storage_types = "raw:lvm:qcow:qcow2:qcow2_on_raw:qcow2_on_lvm:qcow2_on_qcow2"
     
@@ -139,12 +146,15 @@ def main(argv):
     if 'all' == opts.storage_types:
         opts.storage_types = all_storage_types
     
+    _, ip = opts.ssh_creds.rsplit('@', 1)
+
     it = test_storage(opts.vm_image,
                       opts.storage_types,
                       '/tmp',
+                      credentials=opts.ssh_creds,
                       lvm_dev1=opts.lv_dev1,
                       lvm_dev2=opts.lv_dev2,
-                      lambda x : make_vm(x, ip))
+                      make_vm=lambda hdd : make_vm(hdd, ip, opts.libvirt_url))
     
     res = "{storage_type:>10}    bsize ={bsize:>4}    fsize ={fsize:>7} " + \
           "threads ={threads:>2}   write ={write:>6}    " + \
