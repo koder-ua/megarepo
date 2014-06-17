@@ -1,0 +1,102 @@
+class CLS(object):
+    x = 1
+
+obj = CLS()
+
+type(obj) is CLS
+obj.__dict__ == {}
+obj.__class__ is CLS
+
+#----------------------------------------------------------------
+
+CLS.__dict__  == <dictproxy {....
+                        '__doc__': None,
+                        '__module__': '__main__',
+                        'x': 1}>
+CLS.__class__ is type
+
+type(type) is type
+
+CLS2 = type('CLS', (object,), {'x':1})
+type(CLS2) is type
+obj2 = CLS2()
+
+#----------------------------------------------------------------
+
+
+    type---------------- type
+     |                    |
+    CLS <-- object       CLS2
+     |                    |
+    obj                  obj2
+
+
+#----------------------------------------------------------------
+
+a = CLS(1, 2, 3)
+
+a = CLS.__new__(1, 2, 3)
+a.__init__(1, 2, 3)
+
+
+class MyMeta(type):
+    pass
+
+class CLS3(object):
+    __metaclass__ = MyMeta
+    x = 2
+
+CLS3 = MyMeta('CLS3', (object,), {'x': 2})
+type(CLS3) is MyMeta
+
+
+#----------------------------------------------------------------
+
+class CLS4(CLS3):
+    pass
+
+type(CLS4) is MyMeta
+
+
+#----------------------------------------------------------------
+
+class Field(object):
+    class Base(object):
+        pass
+    class Int(Base):
+        pass
+    class String(Base):
+        pass
+
+class LittleORMMeta(type):
+    def __new__(cls, name, bases, cls_dict):
+
+        fields = []
+        for fname, tp in cls_dict.items():
+            if issubclass(tp, Field.Base):
+                fields.append(fname)
+
+        cls_dict['_fields'] = fields
+
+        return super(LittleORMMeta, cls).__new__(cls, name, 
+                                                 bases, cls_dict)
+
+class MyTable(Table):
+    rec_id = Field.Int
+    name = Field.String
+
+
+#----------------------------------------------------------------
+class ClassesRegistry(type):
+    registry = {}
+
+    def __new__(cls, name, bases, cls_dict):
+        new_cls = super(ClassesRegistry, cls).__new__(cls, name, 
+                                                 bases, cls_dict)
+        for base in bases:
+            registry[base] = new_cls
+
+        return new_cls
+
+
+
